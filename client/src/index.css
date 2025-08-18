@@ -10,12 +10,12 @@
 
 :root {
   /* Color Palette */
-  --primary-color: #f47a20; /* Ulta-like orange */
-  --primary-dark: #d76611;
-  --primary-light: #fba35f;
-  --secondary-color: #111827; /* near black for headings/nav */
-  --secondary-dark: #0b1220;
-  --secondary-light: #374151;
+  --primary-color: #111111; /* Sephora-like black */
+  --primary-dark: #000000;
+  --primary-light: #1f2937;
+  --secondary-color: #f3f4f6; /* light gray backgrounds */
+  --secondary-dark: #e5e7eb;
+  --secondary-light: #ffffff;
   
   /* Neutral Colors */
   --white: #ffffff;

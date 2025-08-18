@@ -98,8 +98,8 @@ const MobileMenu = ({ onClose }) => {
           )}
 
           {/* Quick Actions */}
-          <div className="p-4 border-b border-gray-100">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 sm:p-4 border-b border-gray-100">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <Link
                 to="/cart"
                 onClick={onClose}
@@ -120,11 +120,11 @@ const MobileMenu = ({ onClose }) => {
           </div>
 
           {/* Main Menu */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-3 sm:p-4 border-b border-gray-100">
             <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
               Main Menu
             </h3>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {mainMenuItems.map((item, index) => (
                 <motion.div
                   key={item.label}
@@ -149,11 +149,11 @@ const MobileMenu = ({ onClose }) => {
           </div>
 
           {/* Categories */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-3 sm:p-4 border-b border-gray-100">
             <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
               Categories
             </h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {categoryItems.map((category, index) => (
                 <motion.div
                   key={category.name}

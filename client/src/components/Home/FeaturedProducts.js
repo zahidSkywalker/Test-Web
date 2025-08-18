@@ -80,7 +80,7 @@ const FeaturedProducts = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
       {products.map((product, index) => (
         <motion.div
           key={product._id}
@@ -98,7 +98,7 @@ const FeaturedProducts = () => {
                 transition={{ duration: 0.3 }}
                 src={product.mainImage}
                 alt={product.name}
-                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-40 sm:h-48 md:h-56 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
               />
             </Link>
             

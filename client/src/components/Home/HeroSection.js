@@ -5,7 +5,7 @@ import { FiArrowRight, FiPlay } from 'react-icons/fi';
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-pink-50 via-white to-purple-50">
+    <section className="relative min-h-[70vh] md:min-h-[80vh] lg:min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-pink-50 via-white to-purple-50">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -56,7 +56,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight"
+              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight tracking-tight"
             >
               Discover Your
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
@@ -68,7 +68,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-lg md:text-xl text-gray-600 mb-8 max-w-lg lg:max-w-none"
+              className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-xl md:max-w-none"
             >
               Experience the finest collection of cosmetics and skincare products 
               from Bangladesh. Enhance your beauty with our premium selection.
@@ -78,11 +78,11 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start"
             >
               <Link
                 to="/products"
-                className="btn btn-primary text-lg px-8 py-4 group"
+                className="btn btn-primary text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 group"
               >
                 Shop Now
                 <motion.div
@@ -93,7 +93,7 @@ const HeroSection = () => {
                 </motion.div>
               </Link>
               
-              <button className="btn btn-outline text-lg px-8 py-4 group">
+              <button className="btn btn-outline text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 group">
                 <FiPlay className="mr-2" />
                 Watch Video
               </button>

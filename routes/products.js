@@ -4,6 +4,18 @@ const { check, validationResult } = require('express-validator');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const { auth, admin } = require('../middleware/auth');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Multer in-memory storage
+const upload = multer({ storage: multer.memoryStorage() });
 
 // @route   GET api/products
 // @desc    Get all products with pagination and filtering
@@ -86,6 +98,52 @@ router.get('/', async (req, res) => {
     const products = await Product.find(query)
       .populate('category', 'name slug')
       .sort(sort)
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Product.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      products,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalProducts: total,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   GET api/products/admin
+// @desc    Get all products with admin visibility (includes inactive)
+// @access  Private (Admin only)
+router.get('/admin', [auth, admin], async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const query = {};
+
+    if (req.query.search) {
+      query.$or = [
+        { name: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } }
+      ];
+    }
+
+    if (req.query.isActive === 'true') query.isActive = true;
+    if (req.query.isActive === 'false') query.isActive = false;
+
+    const products = await Product.find(query)
+      .populate('category', 'name slug')
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -222,6 +280,47 @@ router.post('/', [auth, admin, [
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
+  }
+});
+
+// @route   POST api/products/upload
+// @desc    Upload product images to Cloudinary
+// @access  Private (Admin only)
+router.post('/upload', [auth, admin, upload.array('images', 10)], async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'No files uploaded' });
+    }
+
+    const uploads = await Promise.all(
+      req.files.map(file =>
+        cloudinary.uploader.upload_stream({ folder: 'lech-fita/products' }, (error, result) => {
+          // This callback is not used directly due to stream handling below
+        })
+      )
+    );
+
+    // Because cloudinary.uploader.upload_stream uses streams, handle sequentially
+    const urls = [];
+    for (const file of req.files) {
+      const buffer = file.buffer;
+      const url = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'lech-fita/products' },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result.secure_url);
+          }
+        );
+        stream.end(buffer);
+      });
+      urls.push(url);
+    }
+
+    res.json({ urls });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Image upload failed' });
   }
 });
 

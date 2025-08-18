@@ -4,11 +4,13 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 
 // Security middleware
+app.set('trust proxy', 1);
 app.use(helmet());
 app.use(compression());
 
@@ -23,13 +25,20 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS
+// CORS (env-driven for production)
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(o => o.trim())
+  : (process.env.NODE_ENV === 'production' ? [] : ['http://localhost:3000']);
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://lech-fita.herokuapp.com', 'https://lech-fita.com']
-    : ['http://localhost:3000'],
+  origin: allowedOrigins.length > 0 ? allowedOrigins : true,
   credentials: true
 }));
+
+// Health check
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/lech-fita', {
@@ -56,6 +65,15 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
   });
 }
+
+// Not found handler
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Not Found' });
+});
+
+// Centralized error handler
+const { errorHandler } = require('./middleware/errorHandler');
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

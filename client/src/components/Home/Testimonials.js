@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FiStar, FiQuote } from 'react-icons/fi';
+import { FiStar } from 'react-icons/fi';
+import { FaQuoteRight } from 'react-icons/fa';
 
 const Testimonials = () => {
   const testimonials = [
@@ -73,7 +74,7 @@ const Testimonials = () => {
         >
           {/* Quote Icon */}
           <div className="absolute top-4 right-4 text-primary/20">
-            <FiQuote size={24} />
+            <FaQuoteRight size={24} />
           </div>
 
           {/* Rating */}

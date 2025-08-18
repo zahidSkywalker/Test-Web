@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const { auth } = require('../middleware/auth');
+const axios = require('axios');
 const Order = require('../models/Order');
 const User = require('../models/User');
 
@@ -123,8 +124,20 @@ router.post('/ssl-commerce/success', async (req, res) => {
       cus_val4
     } = req.body;
 
-    // Verify the payment
-    if (status !== 'VALID') {
+    // Server-side validate with SSLCommerz validator API
+    const validatorUrl = `${SSL_COMMERCE_CONFIG.base_url}/validator/api/validationserverAPI.php`;
+    const params = new URLSearchParams({
+      val_id,
+      store_id: SSL_COMMERCE_CONFIG.store_id,
+      store_passwd: SSL_COMMERCE_CONFIG.store_password,
+      v: '1',
+      format: 'json'
+    });
+
+    const validationResponse = await axios.get(`${validatorUrl}?${params.toString()}`);
+    const validationData = validationResponse.data || {};
+
+    if (validationData.status !== 'VALID') {
       return res.status(400).json({ message: 'Payment validation failed' });
     }
 
@@ -136,21 +149,25 @@ router.post('/ssl-commerce/success', async (req, res) => {
     }
 
     // Update order with payment details
+    if (order.paymentStatus === 'paid') {
+      return res.json({ success: true, message: 'Payment already processed', orderId: order._id, orderNumber: order.orderNumber });
+    }
+
     order.paymentStatus = 'paid';
     order.orderStatus = 'confirmed';
     order.sslBankTransactionId = bank_tran_id;
     order.sslCardIssuer = card_issuer;
     order.sslCardBrand = card_brand;
-    order.sslCardNumber = card_no;
+    // Do not store full card numbers in database
     order.sslCardIssuerCountry = card_issuer_country;
     order.sslCardIssuerCountryCode = card_issuer_country_code;
     order.sslVerifyKey = verify_key;
     order.sslVerifySignature = verify_sign;
-    order.sslAmount = amount;
-    order.sslCurrency = currency;
+    order.sslAmount = validationData.amount || amount;
+    order.sslCurrency = validationData.currency || currency;
     order.sslTranDate = new Date().toISOString();
     order.sslTranId = tran_id;
-    order.sslStatus = status;
+    order.sslStatus = validationData.status || status;
 
     await order.save();
 
@@ -255,8 +272,19 @@ router.post('/ssl-commerce/ipn', async (req, res) => {
       verify_key
     } = req.body;
 
-    // Verify the IPN
-    if (status !== 'VALID') {
+    // Validate IPN data with validator API
+    const validatorUrl = `${SSL_COMMERCE_CONFIG.base_url}/validator/api/validationserverAPI.php`;
+    const params = new URLSearchParams({
+      val_id,
+      store_id: SSL_COMMERCE_CONFIG.store_id,
+      store_passwd: SSL_COMMERCE_CONFIG.store_password,
+      v: '1',
+      format: 'json'
+    });
+
+    const validationResponse = await axios.get(`${validatorUrl}?${params.toString()}`);
+    const validationData = validationResponse.data || {};
+    if (validationData.status !== 'VALID') {
       return res.status(400).json({ message: 'Invalid IPN' });
     }
 
@@ -269,16 +297,16 @@ router.post('/ssl-commerce/ipn', async (req, res) => {
       order.sslBankTransactionId = bank_tran_id;
       order.sslCardIssuer = card_issuer;
       order.sslCardBrand = card_brand;
-      order.sslCardNumber = card_no;
+      // Do not store full card numbers in database
       order.sslCardIssuerCountry = card_issuer_country;
       order.sslCardIssuerCountryCode = card_issuer_country_code;
       order.sslVerifyKey = verify_key;
       order.sslVerifySignature = verify_sign;
-      order.sslAmount = amount;
-      order.sslCurrency = currency;
+      order.sslAmount = validationData.amount || amount;
+      order.sslCurrency = validationData.currency || currency;
       order.sslTranDate = new Date().toISOString();
       order.sslTranId = tran_id;
-      order.sslStatus = status;
+      order.sslStatus = validationData.status || status;
 
       await order.save();
 

@@ -11,6 +11,7 @@
     "build": "cd client && npm run build",
     "install-client": "cd client && npm install",
     "heroku-postbuild": "npm run install-client && npm run build",
+    "postinstall": "npm run install-client && npm run build",
     "seed": "node scripts/seedDatabase.js"
   },
   "keywords": ["ecommerce", "cosmetics", "mern", "bangladesh"],
@@ -29,13 +30,14 @@
     "nodemailer": "^6.9.4",
     "express-rate-limit": "^6.10.0",
     "helmet": "^7.0.0",
-    "compression": "^1.7.4"
+    "compression": "^1.7.4",
+    "axios": "^1.6.8"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
     "concurrently": "^8.2.0"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   }
 }

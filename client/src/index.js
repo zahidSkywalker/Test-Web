@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -14,6 +15,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Configure axios base URL for API requests
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || '';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

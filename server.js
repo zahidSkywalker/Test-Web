@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -57,13 +58,24 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/reviews', require('./routes/reviews'));
 
-// Serve static assets in production
+// Basic root route (always available)
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'ok', service: 'lech-fita-backend' });
+});
+
+// Serve static assets in production when build exists
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/build'));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  });
+  const buildIndex = path.resolve(__dirname, 'client', 'build', 'index.html');
+  const buildFolder = path.resolve(__dirname, 'client', 'build');
+
+  if (fs.existsSync(buildIndex)) {
+    app.use(express.static(buildFolder));
+    app.get('*', (req, res) => {
+      res.sendFile(buildIndex);
+    });
+  } else {
+    console.warn('client/build not found; skipping static serve.');
+  }
 }
 
 // Not found handler

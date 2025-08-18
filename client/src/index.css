@@ -10,12 +10,12 @@
 
 :root {
   /* Color Palette */
-  --primary-color: #ff6b9d;
-  --primary-dark: #e55a8a;
-  --primary-light: #ff8bb3;
-  --secondary-color: #8b5cf6;
-  --secondary-dark: #7c3aed;
-  --secondary-light: #a78bfa;
+  --primary-color: #f47a20; /* Ulta-like orange */
+  --primary-dark: #d76611;
+  --primary-light: #fba35f;
+  --secondary-color: #111827; /* near black for headings/nav */
+  --secondary-dark: #0b1220;
+  --secondary-light: #374151;
   
   /* Neutral Colors */
   --white: #ffffff;

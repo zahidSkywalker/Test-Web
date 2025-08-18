@@ -88,7 +88,7 @@ const FeaturedProducts = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: index * 0.1 }}
-          className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+          className="group bg-white rounded-lg border border-gray-100 hover:shadow-md transition-all duration-200 overflow-hidden"
         >
           {/* Product Image */}
           <div className="relative overflow-hidden">
@@ -103,19 +103,19 @@ const FeaturedProducts = () => {
             </Link>
             
             {/* Badges */}
-            <div className="absolute top-3 left-3 flex flex-col gap-2">
+            <div className="absolute top-2 left-2 flex flex-col gap-1.5">
               {product.isNew && (
-                <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                <span className="bg-gray-900 text-white text-[10px] px-2 py-0.5 rounded-full font-medium tracking-wide">
                   NEW
                 </span>
               )}
               {product.onSale && (
-                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                <span className="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-medium tracking-wide">
                   SALE
                 </span>
               )}
               {product.isFeatured && (
-                <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                <span className="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-medium tracking-wide">
                   FEATURED
                 </span>
               )}
@@ -154,7 +154,7 @@ const FeaturedProducts = () => {
           </div>
 
           {/* Product Info */}
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             {/* Category */}
             <div className="text-xs text-gray-500 mb-2">
               {product.category?.name}
@@ -168,7 +168,7 @@ const FeaturedProducts = () => {
             </Link>
 
             {/* Rating */}
-            <div className="flex items-center mb-3">
+            <div className="flex items-center mb-2.5">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <FiStar
@@ -189,7 +189,7 @@ const FeaturedProducts = () => {
             {/* Price */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold text-primary">
+                <span className="text-base sm:text-lg font-semibold text-gray-900">
                   ৳{product.price}
                 </span>
                 {product.onSale && (

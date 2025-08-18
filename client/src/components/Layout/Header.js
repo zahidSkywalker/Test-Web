@@ -50,9 +50,9 @@ const Header = () => {
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-white shadow-lg backdrop-blur-md bg-opacity-95' 
+          ? 'bg-white/95 shadow-md backdrop-blur supports-[backdrop-filter]:backdrop-blur' 
           : 'bg-white'
-      }`}>
+      } border-b border-gray-100`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -70,13 +70,13 @@ const Header = () => {
             <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 text-sm lg:text-base">
               <Link 
                 to="/" 
-                className="text-gray-700 hover:text-primary transition-colors duration-200"
+                className="text-gray-800 hover:text-primary transition-colors duration-200"
               >
                 Home
               </Link>
               <Link 
                 to="/products" 
-                className="text-gray-700 hover:text-primary transition-colors duration-200"
+                className="text-gray-800 hover:text-primary transition-colors duration-200"
               >
                 Products
               </Link>

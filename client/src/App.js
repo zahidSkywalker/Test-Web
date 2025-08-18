@@ -9,6 +9,7 @@ import ProductDetail from './pages/ProductDetail';
 import Category from './pages/Category';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import About from './pages/About';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Profile from './pages/Profile/Profile';
@@ -32,6 +33,7 @@ function App() {
               <Route path="products" element={<Products />} />
               <Route path="products/:id" element={<ProductDetail />} />
               <Route path="category/:slug" element={<Category />} />
+              <Route path="about" element={<About />} />
               <Route path="cart" element={<Cart />} />
               <Route path="checkout" element={<Checkout />} />
               <Route path="login" element={<Login />} />

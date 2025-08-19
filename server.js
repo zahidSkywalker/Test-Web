@@ -1,17 +1,46 @@
+console.log('🚀 Starting server initialization...');
+
 const express = require('express');
+console.log('✅ Express loaded');
+
 const mongoose = require('mongoose');
+console.log('✅ Mongoose loaded');
+
 const cors = require('cors');
+console.log('✅ CORS loaded');
+
 const helmet = require('helmet');
+console.log('✅ Helmet loaded');
+
 const compression = require('compression');
+console.log('✅ Compression loaded');
+
 const rateLimit = require('express-rate-limit');
+console.log('✅ Rate limit loaded');
+
 const path = require('path');
-const fs = require('fs');
+console.log('✅ Path loaded');
+
 require('dotenv').config();
+console.log('✅ Dotenv loaded');
+console.log('🌍 Environment:', process.env.NODE_ENV);
+console.log('🔑 JWT_SECRET exists:', !!process.env.JWT_SECRET);
+console.log('🗄️ MONGODB_URI exists:', !!process.env.MONGODB_URI);
 
 const app = express();
 
+// Add error handling for uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
+  process.exit(1);
+});
+
 // Security middleware
-app.set('trust proxy', 1);
 app.use(helmet());
 app.use(compression());
 
@@ -26,20 +55,13 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS (env-driven for production)
-const allowedOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(',').map(o => o.trim())
-  : (process.env.NODE_ENV === 'production' ? [] : ['http://localhost:3000']);
-
+// CORS
 app.use(cors({
-  origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://lech-fita.herokuapp.com', 'https://lech-fita.com']
+    : ['http://localhost:3000'],
   credentials: true
 }));
-
-// Health check
-app.get('/healthz', (req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/lech-fita', {
@@ -49,46 +71,115 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/lech-fita
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.log('MongoDB Connection Error:', err));
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/products', require('./routes/products'));
-app.use('/api/categories', require('./routes/categories'));
-app.use('/api/orders', require('./routes/orders'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/payment', require('./routes/payment'));
-app.use('/api/reviews', require('./routes/reviews'));
-
-// Basic root route (always available)
-app.get('/', (req, res) => {
-  res.status(200).json({ status: 'ok', service: 'lech-fita-backend' });
+// Health check endpoint
+app.get('/health', (req, res) => {
+  try {
+    res.json({ 
+      status: 'OK', 
+      message: 'Server is running',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(500).json({ error: 'Health check failed' });
+  }
 });
 
-// Serve static assets in production when build exists
-if (process.env.NODE_ENV === 'production') {
-  const buildIndex = path.resolve(__dirname, 'client', 'build', 'index.html');
-  const buildFolder = path.resolve(__dirname, 'client', 'build');
+// Test endpoint
+app.get('/test', (req, res) => {
+  res.json({ message: 'Test endpoint working' });
+});
 
-  if (fs.existsSync(buildIndex)) {
-    app.use(express.static(buildFolder));
-    app.get('*', (req, res) => {
-      res.sendFile(buildIndex);
-    });
-  } else {
-    console.warn('client/build not found; skipping static serve.');
-  }
+console.log('🛣️ Loading routes...');
+
+// Routes
+try {
+  console.log('📁 Loading auth routes...');
+  app.use('/api/auth', require('./routes/auth'));
+  console.log('✅ Auth routes loaded');
+} catch (error) {
+  console.error('❌ Error loading auth routes:', error);
 }
 
-// Not found handler
-app.use((req, res, next) => {
-  res.status(404).json({ message: 'Not Found' });
+try {
+  console.log('📁 Loading product routes...');
+  app.use('/api/products', require('./routes/products'));
+  console.log('✅ Product routes loaded');
+} catch (error) {
+  console.error('❌ Error loading product routes:', error);
+}
+
+try {
+  console.log('📁 Loading category routes...');
+  app.use('/api/categories', require('./routes/categories'));
+  console.log('✅ Category routes loaded');
+} catch (error) {
+  console.error('❌ Error loading category routes:', error);
+}
+
+try {
+  console.log('📁 Loading order routes...');
+  app.use('/api/orders', require('./routes/orders'));
+  console.log('✅ Order routes loaded');
+} catch (error) {
+  console.error('❌ Error loading order routes:', error);
+}
+
+try {
+  console.log('📁 Loading user routes...');
+  app.use('/api/users', require('./routes/users'));
+  console.log('✅ User routes loaded');
+} catch (error) {
+  console.error('❌ Error loading user routes:', error);
+}
+
+try {
+  console.log('📁 Loading payment routes...');
+  app.use('/api/payment', require('./routes/payment'));
+  console.log('✅ Payment routes loaded');
+} catch (error) {
+  console.error('❌ Error loading payment routes:', error);
+}
+
+try {
+  console.log('📁 Loading review routes...');
+  app.use('/api/reviews', require('./routes/reviews'));
+  console.log('✅ Review routes loaded');
+} catch (error) {
+  console.error('❌ Error loading review routes:', error);
+}
+
+console.log('✅ All routes loaded successfully');
+
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('client/build'));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  res.status(500).json({ 
+    error: 'Something went wrong!',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
 });
 
-// Centralized error handler
-const { errorHandler } = require('./middleware/errorHandler');
-app.use(errorHandler);
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`🧪 Test endpoint: http://localhost:${PORT}/test`);
 });

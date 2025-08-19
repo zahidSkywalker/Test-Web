@@ -20,6 +20,8 @@ console.log('✅ Rate limit loaded');
 
 const path = require('path');
 console.log('✅ Path loaded');
+console.log('📁 Path module:', typeof path);
+console.log('📁 Path resolve function:', typeof path.resolve);
 
 require('dotenv').config();
 console.log('✅ Dotenv loaded');
@@ -28,6 +30,9 @@ console.log('🔑 JWT_SECRET exists:', !!process.env.JWT_SECRET);
 console.log('🗄️ MONGODB_URI exists:', !!process.env.MONGODB_URI);
 
 const app = express();
+
+// Trust proxy for Render deployment
+app.set('trust proxy', 1);
 
 // Add error handling for uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -154,11 +159,28 @@ console.log('✅ All routes loaded successfully');
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/build'));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  });
+  try {
+    console.log('📁 Setting up static file serving...');
+    console.log('📁 __dirname:', __dirname);
+    console.log('📁 Path resolve test:', path.resolve(__dirname, 'client', 'build', 'index.html'));
+    
+    app.use(express.static('client/build'));
+    
+    app.get('*', (req, res) => {
+      try {
+        const filePath = path.resolve(__dirname, 'client', 'build', 'index.html');
+        console.log('📁 Serving file:', filePath);
+        res.sendFile(filePath);
+      } catch (error) {
+        console.error('❌ Error serving static file:', error);
+        res.status(500).json({ error: 'Static file error', details: error.message });
+      }
+    });
+    
+    console.log('✅ Static file serving configured');
+  } catch (error) {
+    console.error('❌ Error setting up static files:', error);
+  }
 }
 
 // Global error handling middleware

@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
 });
 
 // Configure axios base URL for API requests
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || '';
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://test-web-qtok.onrender.com';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

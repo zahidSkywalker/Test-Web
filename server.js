@@ -18,10 +18,8 @@ console.log('✅ Compression loaded');
 const rateLimit = require('express-rate-limit');
 console.log('✅ Rate limit loaded');
 
-const path = require('path');
-console.log('✅ Path loaded');
-console.log('📁 Path module:', typeof path);
-console.log('📁 Path resolve function:', typeof path.resolve);
+// Path module not needed for API-only backend
+console.log('✅ Backend configured for API-only (no static files)');
 
 require('dotenv').config();
 console.log('✅ Dotenv loaded');
@@ -167,41 +165,9 @@ try {
 
 console.log('✅ All routes loaded successfully');
 
-// Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
-  try {
-    console.log('📁 Setting up static file serving...');
-    console.log('📁 __dirname:', __dirname);
-    console.log('📁 Path module type:', typeof path);
-    console.log('📁 Path resolve function:', typeof path.resolve);
-    console.log('📁 Path resolve test:', path.resolve(__dirname, 'client', 'build', 'index.html'));
-    
-    // Check if client/build directory exists
-    const fs = require('fs');
-    const buildPath = path.join(__dirname, 'client', 'build');
-    console.log('📁 Build path:', buildPath);
-    console.log('📁 Build directory exists:', fs.existsSync(buildPath));
-    
-    app.use(express.static('client/build'));
-    
-    app.get('*', (req, res) => {
-      try {
-        console.log('📁 Catch-all route hit for:', req.path);
-        const filePath = path.resolve(__dirname, 'client', 'build', 'index.html');
-        console.log('📁 Serving file:', filePath);
-        console.log('📁 File exists:', fs.existsSync(filePath));
-        res.sendFile(filePath);
-      } catch (error) {
-        console.error('❌ Error serving static file:', error);
-        res.status(500).json({ error: 'Static file error', details: error.message });
-      }
-    });
-    
-    console.log('✅ Static file serving configured');
-  } catch (error) {
-    console.error('❌ Error setting up static files:', error);
-  }
-}
+// Note: Frontend is deployed separately on Vercel
+// Backend only handles API requests
+console.log('📁 Frontend deployed separately on Vercel - no static files needed');
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

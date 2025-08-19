@@ -96,6 +96,16 @@ app.get('/test', (req, res) => {
   res.json({ message: 'Test endpoint working' });
 });
 
+// Simple test without path module
+app.get('/simple', (req, res) => {
+  res.json({ 
+    message: 'Simple endpoint working',
+    pathModule: typeof path,
+    dirname: __dirname,
+    timestamp: new Date().toISOString()
+  });
+});
+
 console.log('🛣️ Loading routes...');
 
 // Routes
@@ -162,14 +172,24 @@ if (process.env.NODE_ENV === 'production') {
   try {
     console.log('📁 Setting up static file serving...');
     console.log('📁 __dirname:', __dirname);
+    console.log('📁 Path module type:', typeof path);
+    console.log('📁 Path resolve function:', typeof path.resolve);
     console.log('📁 Path resolve test:', path.resolve(__dirname, 'client', 'build', 'index.html'));
+    
+    // Check if client/build directory exists
+    const fs = require('fs');
+    const buildPath = path.join(__dirname, 'client', 'build');
+    console.log('📁 Build path:', buildPath);
+    console.log('📁 Build directory exists:', fs.existsSync(buildPath));
     
     app.use(express.static('client/build'));
     
     app.get('*', (req, res) => {
       try {
+        console.log('📁 Catch-all route hit for:', req.path);
         const filePath = path.resolve(__dirname, 'client', 'build', 'index.html');
         console.log('📁 Serving file:', filePath);
+        console.log('📁 File exists:', fs.existsSync(filePath));
         res.sendFile(filePath);
       } catch (error) {
         console.error('❌ Error serving static file:', error);
